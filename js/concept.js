@@ -89,7 +89,7 @@
       var a = $('.tn-atom', e); if (!a) return;
       var r = e.getBoundingClientRect(), L0 = lum(getComputedStyle(a).color);
       if (pr && r.left < pr.right + 10 && r.right > pr.left - 10 && r.top < pr.bottom + 40 && r.bottom > pr.top - 10) return;
-      if (e.dataset.elemId === '1774443653075000001') { a.style.setProperty('color', '#FF4D00', 'important'); return; }
+      if (e.dataset.elemId === '1774443653075000001') { a.style.setProperty('color', '#E15F20', 'important'); return; }
       if (L0 <= 0.7) return;
       $$('*', a).forEach(function (x) { if (lum(getComputedStyle(x).color) === L0) x.style.setProperty('color', '#49403E', 'important'); });
       a.style.setProperty('color', '#49403E', 'important');

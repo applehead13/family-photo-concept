@@ -29,7 +29,7 @@ html.vs-docked #rec4193905201 .t396__artboard { opacity: 1 !important; pointer-e
 .vs-nav .tn-atom a, .vs-nav .tn-atom { position: relative; }
 .vs-nav .tn-atom a::before {
   content: ''; position: absolute; left: -7px; right: -7px; top: -3px; bottom: -3px;
-  --c: #FF4D00;
+  --c: #E15F20;
   background:
     linear-gradient(var(--c),var(--c)) 0 0/6px 1.5px, linear-gradient(var(--c),var(--c)) 0 0/1.5px 6px,
     linear-gradient(var(--c),var(--c)) 100% 0/6px 1.5px, linear-gradient(var(--c),var(--c)) 100% 0/1.5px 6px,
@@ -73,7 +73,7 @@ html.vs-docked #rec4193905201 .t396__artboard { opacity: 1 !important; pointer-e
 #vs-vf.vs-ready { opacity: 1; }
 #vs-vf::before { /* точка фокуса */
   content: ''; position: absolute; left: 50%; top: 50%; width: 5px; height: 5px; margin: -2.5px 0 0 -2.5px;
-  background: #FF4D00; border-radius: 50%; box-sizing: border-box;
+  background: #E15F20; border-radius: 50%; box-sizing: border-box;
   transition: all .25s ease;
 }
 #vs-vf::after { /* подпись как на экране камеры */
@@ -84,10 +84,10 @@ html.vs-docked #rec4193905201 .t396__artboard { opacity: 1 !important; pointer-e
   position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none;
 }
 /* над ссылкой и кнопкой: рамка сжимается и краснеет, как точка автофокуса */
-#vs-vf.vs-link { --c: #FF4D00; width: 28px; height: 22px; margin: -11px 0 0 -14px; }
+#vs-vf.vs-link { --c: #E15F20; width: 28px; height: 22px; margin: -11px 0 0 -14px; }
 /* над фотографией: большая рамка, квадрат фокуса и параметры съёмки */
 #vs-vf.vs-on { --c: #fff; --l: 12px; --w: 1.5px; width: 84px; height: 60px; margin: -30px 0 0 -42px; filter: drop-shadow(0 0 2px rgba(0,0,0,.35)); }
-#vs-vf.vs-on::before { width: 14px; height: 14px; margin: -7px 0 0 -7px; background: none; border: 1.5px solid #FF4D00; border-radius: 1px; animation: vs-af .5s ease-out; }
+#vs-vf.vs-on::before { width: 14px; height: 14px; margin: -7px 0 0 -7px; background: none; border: 1.5px solid #E15F20; border-radius: 1px; animation: vs-af .5s ease-out; }
 #vs-vf.vs-on::after { opacity: 1; }
 #vs-vf.vs-press { width: 32px; height: 24px; margin: -12px 0 0 -16px; }
 #vs-vf.vs-on.vs-press { width: 72px; height: 50px; margin: -25px 0 0 -36px; }
@@ -112,16 +112,16 @@ html.vs-vf-active, html.vs-vf-active * { cursor: none !important; }
 #vs-lb .vs-lb-title { font-family: 'Moniqa', Arial, sans-serif; font-weight: 900; text-transform: uppercase; font-size: 44px; line-height: 1; color: #f2efe9; }
 #vs-lb .vs-lb-meta { opacity: .75; }
 #vs-lb .vs-lb-close { background: none; border: 0; color: inherit; font: inherit; cursor: pointer; padding: 6px 0; }
-#vs-lb .vs-lb-close:hover { color: #FF4D00; }
+#vs-lb .vs-lb-close:hover { color: #E15F20; }
 #vs-lb .vs-lb-stage { position: absolute; left: 90px; right: 90px; top: 86px; bottom: 96px; display: flex; align-items: center; justify-content: center; }
 #vs-lb .vs-lb-stage img { max-width: 100%; max-height: 100%; border-radius: 8px; box-shadow: 0 18px 50px rgba(0,0,0,.45); transition: opacity .25s ease; }
 #vs-lb .vs-lb-nav { position: absolute; top: 50%; transform: translateY(-50%); background: none; border: 0; color: inherit; font: 300 40px/1 'Source Code Pro', monospace; cursor: pointer; padding: 20px 14px; }
-#vs-lb .vs-lb-nav:hover { color: #FF4D00; }
+#vs-lb .vs-lb-nav:hover { color: #E15F20; }
 #vs-lb .vs-lb-prev { left: 16px; }
 #vs-lb .vs-lb-next { right: 16px; }
 #vs-lb .vs-lb-strip { position: absolute; left: 24px; right: 24px; bottom: 18px; display: flex; gap: 8px; justify-content: center; overflow-x: auto; }
 #vs-lb .vs-lb-strip button { flex: 0 0 auto; width: 54px; height: 54px; padding: 0; border: 1.5px solid transparent; border-radius: 4px; background: center/cover no-repeat; opacity: .55; cursor: pointer; }
-#vs-lb .vs-lb-strip button.vs-cur { border-color: #FF4D00; opacity: 1; }
+#vs-lb .vs-lb-strip button.vs-cur { border-color: #E15F20; opacity: 1; }
 #vs-lb .vs-lb-hint { position: absolute; left: 24px; bottom: 34px; opacity: .55; font-size: 12px; }
 @media (max-width: 767px) {
   #vs-lb .vs-lb-title { font-size: 30px; }
@@ -137,7 +137,7 @@ html.vs-lb-lock, html.vs-lb-lock body { overflow: hidden !important; }
 #rec4193905301 .tn-elem[data-elem-id="1774443653075000001"] { z-index: 9999 !important; }
 html.vs-logo-center .js-header-word, html.vs-logo-center .js-header-word-1 { visibility: hidden !important; }
 #vs-lb button:focus { outline: none; }
-#vs-lb button:focus-visible { outline: 1px solid #FF4D00; outline-offset: 4px; }
+#vs-lb button:focus-visible { outline: 1px solid #E15F20; outline-offset: 4px; }
 
 /* второй закреплённый хедер (белая плашка) — без своей копии имени, появляется вместе с шапкой */
 #rec4193905601 .tn-elem[data-elem-id="1765960002219000001"] { visibility: hidden !important; }
@@ -147,12 +147,12 @@ html.vs-docked #rec4193905601 .t396__artboard { opacity: 1 !important; }
 /* пункты списков: оранжевая точка вместо наклонной черты */
 .vs-b {
   display: inline-block; width: .42em; height: .42em; border-radius: 50%;
-  background: #FF4D00; margin-right: .6em; vertical-align: .12em;
+  background: #E15F20; margin-right: .6em; vertical-align: .12em;
 }
 .vs-li { display: block; position: relative; padding-left: 1.05em; }
 .vs-li::before {
   content: ''; position: absolute; left: 0; top: calc(.5lh - .21em);
-  width: .42em; height: .42em; border-radius: 50%; background: #FF4D00;
+  width: .42em; height: .42em; border-radius: 50%; background: #E15F20;
 }
 
 /* цены услуг — тем же шрифтом, что названия */
@@ -184,7 +184,7 @@ html.vs-docked #rec4193905601 .t396__artboard { opacity: 1 !important; }
 .vs-film-cap { color: #F3EFE7; }
 .vs-film-title { display: flex; align-items: baseline; gap: .55em; margin-bottom: .55em; }
 .vs-film-title span:last-child { color: #F3EFE7; }
-.vs-film-num { font: 600 11px/1 'Source Code Pro', monospace; color: #FF4D00; letter-spacing: .06em; }
+.vs-film-num { font: 600 11px/1 'Source Code Pro', monospace; color: #E15F20; letter-spacing: .06em; }
 .vs-film-text { position: relative; color: #E9E3D8; }
 .vs-film-mark { position: absolute; }
 .vs-film-mark svg { width: 100%; height: 100%; display: block; }
@@ -192,7 +192,7 @@ html.vs-docked #rec4193905601 .t396__artboard { opacity: 1 !important; }
 
 /* --- рукописные линии одной толщины по всему сайту */
 .vs-mk {
-  fill: none !important; stroke: #FF4D00; stroke-width: var(--vs-mk-w, 1.6px) !important;
+  fill: none !important; stroke: #E15F20; stroke-width: var(--vs-mk-w, 1.6px) !important;
   stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke;
 }
 .vs-mk-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
@@ -230,10 +230,10 @@ html:not(.vs-loaded) #rec4193905301 .t396__artboard { opacity: 0; }
 
 /* первый экран: оранжевый заголовок и кнопка, красный «REC», чистое фото со скрепкой */
 #rec4193905301 .tn-elem[data-elem-id="1765879234013"] .tn-atom,
-#rec4193905301 .tn-elem[data-elem-id="1765879234013"] .tn-atom * { color: #FF4D00 !important; }
-#rec4193905301 .tn-elem[data-elem-id="1765885621834000001"] .tn-atom { background-color: #FF4D00 !important; color: #fff !important; transition: background-color .3s ease, box-shadow .3s ease; }
+#rec4193905301 .tn-elem[data-elem-id="1765879234013"] .tn-atom * { color: #E15F20 !important; }
+#rec4193905301 .tn-elem[data-elem-id="1765885621834000001"] .tn-atom { background-color: #E15F20 !important; color: #fff !important; transition: background-color .3s ease, box-shadow .3s ease; }
 #rec4193905301 .tn-elem[data-elem-id="1765885621834000001"] .tn-atom * { color: #fff !important; }
-#rec4193905301 .tn-elem[data-elem-id="1765885621834000001"]:hover .tn-atom { background-color: #E04300 !important; }
+#rec4193905301 .tn-elem[data-elem-id="1765885621834000001"]:hover .tn-atom { background-color: #C9521A !important; }
 #rec4193905301 .tn-elem[data-elem-id="1770388091245"] .tn-atom { background: #E5232A !important; border-radius: 50% !important; animation: vs-rec 1.3s steps(1, end) infinite; }
 @keyframes vs-rec { 0%, 100% { opacity: 1; } 55% { opacity: .12; } }
 #rec4193905301 .tn-elem[data-elem-id="1774626918803000002"],
