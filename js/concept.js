@@ -69,6 +69,23 @@
     });
   }
 
+
+  /* ---------- первый экран на белой бумаге: светлый текст делаем тёмным ---------- */
+  function heroInk() {
+    var R = $(HERO); if (!R) return;
+    var ph = el('1774443048931000006', R), pr = ph ? ph.getBoundingClientRect() : null;
+    var lum = function (c) { var m = c.match(/[\d.]+/g).map(Number); return (0.3 * m[0] + 0.59 * m[1] + 0.11 * m[2]) / 255; };
+    $$('.tn-elem[data-elem-type=text]', R).forEach(function (e) {
+      var a = $('.tn-atom', e); if (!a) return;
+      var r = e.getBoundingClientRect(), L0 = lum(getComputedStyle(a).color);
+      if (pr && r.left < pr.right + 10 && r.right > pr.left - 10 && r.top < pr.bottom + 40 && r.bottom > pr.top - 10) return;
+      if (e.dataset.elemId === '1774443653075000001') { a.style.setProperty('color', '#FF4D00', 'important'); return; }
+      if (L0 <= 0.7) return;
+      $$('*', a).forEach(function (x) { if (lum(getComputedStyle(x).color) === L0) x.style.setProperty('color', '#49403E', 'important'); });
+      a.style.setProperty('color', '#49403E', 'important');
+    });
+  }
+
   /* ---------- имя на первом экране → логотип в шапке ---------- */
   var logo, L = null;
   function lerp(a, b, t) { return a + (b - a) * t; }
@@ -112,7 +129,7 @@
     L = {
       x0: x0, y0: y0, x1: hRect.x, y1: hRect.y - hdrStart.top + 0, k: hRect.w / w,
       end: Math.max(120, heroH - (hdrStart.height || 38) - 40),
-      c0: window.VS_LOGO_FROM || [255, 255, 255, .82], c1: [73, 64, 62, 1]
+      c0: window.VS_LOGO_FROM || [73, 64, 62, 1], c1: [73, 64, 62, 1]
     };
     logoUpdate();
     logo.classList.add('vs-ready');
@@ -766,6 +783,7 @@
   function start() {
     unbreak();
     cleanMenus();
+    try { heroInk(); } catch (e) { console.warn(e); }
     layout();
     collectPhotos();
     initViewfinder();
