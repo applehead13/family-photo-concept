@@ -320,14 +320,14 @@
     });
     lbRender();
     lb.classList.add('vs-open'); document.documentElement.classList.add('vs-lb-lock');
-    lb.querySelector('.vs-lb-close').focus();
+    lb.focus();
   }
   function lbClose() { lb.classList.remove('vs-open'); document.documentElement.classList.remove('vs-lb-lock'); }
   function lbStep(d) { var n = G[lbCase].photos.length; lbIdx = (lbIdx + d + n) % n; lbRender(); }
   function initGallery() {
     if (!G.length) return;
     lb = document.createElement('div'); lb.id = 'vs-lb';
-    lb.setAttribute('role', 'dialog'); lb.setAttribute('aria-modal', 'true');
+    lb.setAttribute('role', 'dialog'); lb.setAttribute('aria-modal', 'true'); lb.tabIndex = -1;
     lb.innerHTML = '<div class="vs-lb-top"><div><div class="vs-lb-title"></div><div class="vs-lb-meta"></div></div>' +
       '<button type="button" class="vs-lb-close">закрыть ✕</button></div>' +
       '<button type="button" class="vs-lb-nav vs-lb-prev" aria-label="Предыдущий кадр">←</button>' +
