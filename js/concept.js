@@ -551,9 +551,9 @@
     var z = zoomOf(E[0].inner), P = r1.left - r0.left, u = r0.width / 302;
     var N = E.length, gap = 17 * u, iw = P - gap, ih = iw * 2 / 3, reb = 44 * u, FH = ih + 2 * reb;
     var lead = 0.35 * P, x0 = -gap / 2 - lead, x1 = (N - 1) * P + iw + gap / 2 + 0.25 * P;
-    var sheetTop = -150 * u, stripTop = sheetTop + 20 * u;
+    var sheetTop = -150 * u + 100 * u, stripTop = sheetTop + 20 * u;
 
-    if (film) film.root.remove();
+    if (film) { film.root.remove(); if (film.clip) film.clip.remove(); }
     var root = document.createElement('div'); root.id = 'vs-film';
     var sheet = document.createElement('div'); sheet.className = 'vs-film-sheet';
     var strip = document.createElement('div'); strip.className = 'vs-film-strip';
@@ -567,20 +567,6 @@
     strip.style.webkitMaskPosition = (((-x0 - gap / 2) % pitch) - pitch / 2) + 'px 0';
     strip.style.maskPosition = strip.style.webkitMaskPosition;
     var fs = Math.max(7, 8.5 * u);
-    // надписи по краю плёнки
-    for (var k = -1; k <= N; k++) {
-      var fx = k * P - gap / 2 - x0, n = 14 + k;
-      var a = document.createElement('span'); a.className = 'vs-film-edge';
-      a.textContent = '▸' + n; a.style.left = (fx + 6 * u) + 'px'; a.style.top = (FH - reb + 4 * u) + 'px'; a.style.fontSize = fs + 'px';
-      var b = document.createElement('span'); b.className = 'vs-film-edge';
-      b.textContent = n + 'A'; b.style.left = (fx + P / 2) + 'px'; b.style.top = (FH - reb + 4 * u) + 'px'; b.style.fontSize = fs + 'px';
-      strip.appendChild(a); strip.appendChild(b);
-      if (k % 2 === 0) {
-        var t = document.createElement('span'); t.className = 'vs-film-edge';
-        t.textContent = 'VS 400   ' + (5063 + k); t.style.left = (fx + P * 0.3) + 'px'; t.style.top = (reb - 4 * u - fs) + 'px'; t.style.fontSize = fs + 'px';
-        strip.appendChild(t);
-      }
-    }
     E.forEach(function (e, i) {
       var fr = document.createElement('div'); fr.className = 'vs-film-frame';
       fr.style.left = (i * P - x0 - gap / 2 + gap / 2) + 'px'; fr.style.top = reb + 'px';
@@ -591,11 +577,9 @@
       var cap = document.createElement('div'); cap.className = 'vs-film-cap';
       cap.style.left = (i * P - gap / 2 + gap / 2) + 'px'; cap.style.top = (stripTop + FH + 18 * u) + 'px'; cap.style.width = iw + 'px';
       var h = document.createElement('div'); h.className = 'vs-film-title';
-      var num = document.createElement('span'); num.className = 'vs-film-num'; num.textContent = String(14 + i);
-      num.style.fontSize = 11 * u + 'px';
       var ta = e.title.querySelector('.tn-atom'), tt = document.createElement('span');
       tt.textContent = ta.textContent.trim(); copyFont(ta, tt, zoomOf(e.title));
-      h.appendChild(num); h.appendChild(tt); cap.appendChild(h);
+      h.appendChild(tt); cap.appendChild(h);
       var xa = e.text.querySelector('.tn-atom'), tx = document.createElement('div'); tx.className = 'vs-film-text';
       tx.innerHTML = xa.innerHTML; copyFont(xa, tx, zoomOf(e.text));
       var trc = e.text.getBoundingClientRect(); tx.style.width = trc.width + 'px';
@@ -618,19 +602,38 @@
     pick.innerHTML = '<svg viewBox="0 0 100 66" preserveAspectRatio="none"><path d="M3 5 C 30 2, 70 3, 97 4 C 98 22, 97 45, 96 62 C 70 64, 32 63, 4 61 C 2 44, 3 22, 4 3" fill="none" class="vs-mk"/></svg>';
     root.appendChild(pick);
     var capH = 0; root.querySelectorAll('.vs-film-cap').forEach(function (c) { capH = Math.max(capH, c.offsetHeight); });
-    var board = rec.querySelector('.t396__artboard') || rec; board.appendChild(root); // артборд обрезает плёнку за пределами блока
+    // обычный заголовок над лентой (вместо огромного); едет вместе с лентой по вертикали, по горизонтали стоит на месте
+    var tEl = el('1774365639400000001', rec), head = null;
+    if (tEl) {
+      var ta2 = tEl.querySelector('.tn-atom'), hs = $$('#rec4193908001 .tn-atom').filter(function (x) { return /Когда/.test(x.textContent); })[0];
+      head = document.createElement('div'); head.className = 'vs-film-head'; head.textContent = 'Мои принципы в\u00a0съёмке';
+      copyFont(hs || ta2, head, zoomOf(hs || ta2)); head.style.lineHeight = '1.05';
+      head.style.color = '#AFC8E1'; head.style.textTransform = 'uppercase'; head.style.whiteSpace = 'normal';
+      root.appendChild(head); tEl.classList.add('vs-film-hide');
+    }
+    var board = rec.querySelector('.t396__artboard') || rec;
+    // лента не вылезает за коричневый блок
+    var bgEl = el('1771401540183', rec), clip = document.createElement('div'); clip.id = 'vs-film-clip';
+    var br = bgEl ? bgEl.getBoundingClientRect() : null, bo = board.getBoundingClientRect();
+    clip.style.cssText = 'position:absolute;overflow:hidden;pointer-events:none;z-index:40;left:' + (br ? br.left - bo.left : 0) + 'px;top:0;width:' + (br ? br.width : bo.width) + 'px;height:100%;';
+    clip.appendChild(root); board.appendChild(clip); // артборд обрезает плёнку за пределами блока
     root.querySelectorAll('.vs-film-cap').forEach(function (c) { capH = Math.max(capH, c.offsetHeight); });
+    if (head) { head.style.width = (parseFloat(clip.style.width) - 56 * zoomOf(head)) + 'px'; head.style.top = (stripTop - head.offsetHeight - 26 * u) + 'px'; }
     root.querySelectorAll('.vs-film-text').forEach(function (tx) { (tx._marks || []).forEach(function (mk) { drawMark(tx, mk[0], mk[1]); }); });
     sheet.style.left = (x0 - 0.2 * P) + 'px'; sheet.style.width = (x1 - x0 + 0.35 * P) + 'px';
     sheet.style.top = sheetTop + 'px'; sheet.style.height = (stripTop - sheetTop + FH + 18 * u + capH + 34 * u) + 'px';
     if (getComputedStyle(rec).position === 'static') rec.style.position = 'relative';
-    film = { root: root, rec: board, anchor: E[0].inner };
+    film = { root: root, clip: clip, rec: clip, anchor: E[0].inner, head: head, bg: el('1771401540183', rec) };
     filmTrack();
   }
   function filmTrack() {
     if (!film) return;
     var a = film.anchor.getBoundingClientRect(), r = film.rec.getBoundingClientRect();
     film.root.style.transform = 'translate3d(' + (a.left - r.left) + 'px,' + (a.top - r.top) + 'px,0)';
+    if (film.head) {
+      var bl = film.bg ? film.bg.getBoundingClientRect().left : r.left;
+      film.head.style.left = (bl - a.left + 28 * zoomOf(film.head)) + 'px';
+    }
   }
   function initFilm() {
     var loop = function () { filmTrack(); requestAnimationFrame(loop); };
