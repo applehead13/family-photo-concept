@@ -183,6 +183,46 @@
   }
 
   /* ---------- услуги: звёздочка вплотную к названию, цены в одну строку ---------- */
+  // цены — шрифтом названий, крупнее, на одной базовой линии с названием услуги
+  function alignPrices() {
+    var rec = $(SERVICES); if (!rec) return;
+    var titles = $$('.t396__elem[data-elem-type="text"]', rec).filter(function (e) {
+      var a = e.querySelector('.tn-atom');
+      return a && !e.classList.contains('vs-price') && /Moniqa/.test(getComputedStyle(a).fontFamily) && !/\?/.test(e.textContent) && visible(e) && !e.closest('[data-animate-sbs-event="hover"]');
+    });
+    var priced = [];
+    $$('.t396__elem[data-elem-type="text"]', rec).forEach(function (e) {
+      if (!/\d\s?\d{3}₽/.test(e.textContent) || e.closest('[data-animate-sbs-event="hover"]')) return;
+      e.classList.add('vs-price');
+      e.style.translate = '';
+      if (!visible(e)) return;
+      var er = e.getBoundingClientRect(), cy = (er.top + er.bottom) / 2, best = null, bd = 1e9;
+      titles.forEach(function (t) {
+        var r = t.getBoundingClientRect(), d = Math.abs((r.top + r.bottom) / 2 - cy);
+        if (d < bd && d < 60 * zoomOf(t)) { bd = d; best = t; }
+      });
+      if (!best) return;
+      var ta = best.querySelector('.tn-atom'), atom = e.querySelector('.tn-atom');
+      atom.style.setProperty('font-size', Math.round(parseFloat(getComputedStyle(ta).fontSize) * 0.62) + 'px', 'important');
+      atom.style.setProperty('color', getComputedStyle(ta).color, 'important');
+      // справа в строке — квадратик-отметка: цена не должна на него наезжать
+      var room = 1e9;
+      $$('.t396__elem[data-elem-type="shape"]', rec).forEach(function (sh) {
+        var r = sh.getBoundingClientRect();
+        if (r.width > 0 && r.width < 20 * zoomOf(sh) && r.left > er.left && Math.abs((r.top + r.bottom) / 2 - cy) < 40 * zoomOf(sh)) room = Math.min(room, r.left - 12 * zoomOf(sh) - er.left);
+      });
+      priced.push({ e: e, best: best, ta: ta, atom: atom, room: room });
+    });
+    // один размер на все цены: самый крупный, при котором каждая помещается
+    var k = 1;
+    priced.forEach(function (p) { var b = textBox(p.e); if (b && p.room < 1e9) k = Math.min(k, p.room / (b.right - b.left)); });
+    priced.forEach(function (p) {
+      if (k < 1) p.atom.style.setProperty('font-size', (parseFloat(getComputedStyle(p.ta).fontSize) * 0.62 * k).toFixed(2) + 'px', 'important');
+      var tb = textBox(p.best), pb = textBox(p.e);
+      if (!tb || !pb) return;
+      setTranslate(p.e, 0, baselineOf(tb.first, p.ta) - baselineOf(pb.first, p.atom));
+    });
+  }
   function alignStars() {
     var rec = $(SERVICES); if (!rec) return;
     $$('.t396__elem[data-elem-type="text"]', rec).forEach(function (e) {
@@ -190,7 +230,7 @@
     });
     var titles = $$('.t396__elem[data-elem-type="text"]', rec).filter(function (e) {
       var a = e.querySelector('.tn-atom');
-      return a && /Moniqa/.test(getComputedStyle(a).fontFamily) && !/\?/.test(e.textContent) && visible(e);
+      return a && !e.classList.contains('vs-price') && /Moniqa/.test(getComputedStyle(a).fontFamily) && !/\?/.test(e.textContent) && visible(e);
     });
     var stars = $$('.t396__elem[data-elem-type="shape"]', rec).filter(function (s) {
       var a = s.querySelector('.tn-atom') || s;
@@ -471,7 +511,7 @@
     try { heroFill(); } catch (e) { console.warn(e); }
     try { footerFill(); } catch (e) { console.warn(e); }
     try { alignCaseTitles(); } catch (e) { console.warn(e); }
-    try { alignStars(); } catch (e) { console.warn(e); }
+    try { alignStars(); alignPrices(); } catch (e) { console.warn(e); }
     try { alignStages(); } catch (e) { console.warn(e); }
     try { logoMeasure(); } catch (e) { console.warn(e); }
   }
