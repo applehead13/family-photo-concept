@@ -234,8 +234,8 @@ html:not(.vs-loaded) #rec4193905301 .t396__artboard { opacity: 0; }
 #rec4193905301 .tn-elem[data-elem-id="1765885621834000001"] .tn-atom { background-color: #E15F20 !important; color: #fff !important; transition: background-color .3s ease, box-shadow .3s ease; }
 #rec4193905301 .tn-elem[data-elem-id="1765885621834000001"] .tn-atom * { color: #fff !important; }
 #rec4193905301 .tn-elem[data-elem-id="1765885621834000001"]:hover .tn-atom { background-color: #C9521A !important; }
-#rec4193905301 .tn-elem[data-elem-id="1770388091245"] .tn-atom { background: #E5232A !important; border-radius: 50% !important; animation: vs-rec 1.3s steps(1, end) infinite; }
-@keyframes vs-rec { 0%, 100% { opacity: 1; } 55% { opacity: .12; } }
+#rec4193905301 .tn-elem[data-elem-id="1770388091245"] .tn-atom { background: #E5232A !important; border-radius: 50% !important; transform: scale(1.35); box-shadow: 0 0 6px rgba(229,35,42,.55); animation: vs-rec 2.4s ease-in-out infinite; }
+@keyframes vs-rec { 0%, 42% { opacity: 1; } 62%, 88% { opacity: .15; } 100% { opacity: 1; } }
 #rec4193905301 .tn-elem[data-elem-id="1774626918803000002"],
 #rec4193905301 .tn-elem[data-elem-id="1774626918803000003"],
 #rec4193905301 .tn-elem[data-elem-id="1774626918803000004"] { display: none !important; }
