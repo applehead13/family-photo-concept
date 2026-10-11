@@ -331,6 +331,68 @@
     });
   }
 
+  /* ---------- услуги: описание открывается по наведению на всю строку, звёздочки — с запасом ---------- */
+  function initServiceHover() {
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+    var R = $('#rec4193908001'); if (!R) return;
+    var zones = [];   // { trg: [elements with Tilda listeners], area: function -> rect, on: bool }
+    var byTrg = {};
+    $$('[data-animate-sbs-event="hover"]', R).forEach(function (t) {
+      (t.dataset.animateSbsTrgels || '').split(',').forEach(function (id) {
+        if (id) (byTrg[id] = byTrg[id] || []).push(t);
+      });
+    });
+    function nodes(id) { return $$('[data-elem-id="' + id + '"], [data-group-id="' + id + '"]', R); }
+    function rectOf(e) { return e.getBoundingClientRect(); }
+    Object.keys(byTrg).forEach(function (id) {
+      var trg = nodes(id).filter(function (n) { return n.getBoundingClientRect().width > 0; });
+      if (!trg.length) return;
+      var isStar = trg.some(function (n) { return n.querySelector('[data-original*="6134-6435-4665-a462-623832386266"], [style*="6134-6435-4665-a462-623832386266"]'); });
+      var targets = byTrg[id];
+      var area;
+      if (isStar) {
+        area = function () { var r = rectOf(trg[0]), p = 9; return { l: r.left - p, r: r.right + p, t: r.top - p, b: r.bottom + p }; };
+      } else {
+        // строка услуги: самая широкая видимая полоса из анимируемых элементов этой строки
+        area = function () {
+          var best = null;
+          targets.forEach(function (t) { var r = rectOf(t); if (r.left >= 0 && r.width > 0 && (!best || r.width > best.width)) best = r; });
+          var tr = rectOf(trg[0]);
+          if (!best) best = tr;
+          return { l: best.left, r: best.right, t: Math.min(best.top, tr.top), b: Math.max(best.bottom, tr.bottom) };
+        };
+      }
+      // настоящие mouseenter/leave на триггере больше не управляют анимацией — ими управляет зона
+      trg.forEach(function (n) {
+        ['mouseenter', 'mouseleave'].forEach(function (type) {
+          n.addEventListener(type, function (ev) { if (ev.isTrusted) ev.stopImmediatePropagation(); }, true);
+        });
+      });
+      zones.push({ trg: trg, area: area, star: isStar, on: false });
+    });
+    function fire(z, type) { z.trg.forEach(function (n) { n.dispatchEvent(new MouseEvent(type, { bubbles: false })); }); }
+    var raf = 0, mx = -1, my = -1;
+    function check() {
+      raf = 0;
+      var starOn = false;
+      zones.forEach(function (z) {
+        if (!z.star) return;
+        var a = z.area(), inside = mx >= a.l && mx <= a.r && my >= a.t && my <= a.b;
+        z.want = inside; if (inside) starOn = true;
+      });
+      zones.forEach(function (z) {
+        if (z.star) return;
+        var a = z.area();
+        z.want = !starOn && mx >= a.l && mx <= a.r && my >= a.t && my <= a.b;
+      });
+      zones.forEach(function (z) { if (z.want !== z.on) { z.on = z.want; fire(z, z.on ? 'mouseenter' : 'mouseleave'); } });
+    }
+    function queue(ev) { if (ev) { mx = ev.clientX; my = ev.clientY; } if (!raf) raf = requestAnimationFrame(check); }
+    document.addEventListener('mousemove', queue, { passive: true });
+    window.addEventListener('scroll', function () { queue(); }, { passive: true });
+    document.addEventListener('mouseleave', function () { mx = my = -1; queue(); });
+  }
+
   /* ---------- галереи историй ---------- */
   var G = window.VS_GALLERIES || [];
   function galleryOf(e) {
@@ -420,6 +482,7 @@
     layout();
     collectPhotos();
     initViewfinder();
+    initServiceHover();
     initGallery();
     window.addEventListener('scroll', logoUpdate, { passive: true });
     window.addEventListener('resize', relayout);
