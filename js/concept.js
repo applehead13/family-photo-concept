@@ -213,6 +213,31 @@
     });
   }
 
+
+  /* ---------- этапы работы: пункты сразу под заголовком, отступ везде одинаковый ---------- */
+  var STAGES = '#rec4193906401';
+  function alignStages() {
+    var rec = $(STAGES); if (!rec) return;
+    var texts = $$('.t396__elem[data-elem-type="text"]', rec);
+    texts.forEach(function (e) { e.style.translate = ''; });
+    texts.forEach(function (h) {
+      var a = h.querySelector('.tn-atom');
+      if (!a || !/Moniqa/.test(getComputedStyle(a).fontFamily) || !visible(h)) return;
+      var hb = textBox(h); if (!hb) return;
+      if (hb.bottom - hb.top > 200) return;            // большой заголовок блока
+      var list = null, best = 1e9;
+      texts.forEach(function (t) {
+        if (t === h || !t.querySelector('.vs-li, .vs-b') || !visible(t)) return;
+        var tb = textBox(t); if (!tb) return;
+        var dy = tb.top - hb.bottom, dx = Math.abs(tb.left - hb.left);
+        if (dy > -5 && dx < 40 && dy < best) { best = dy; list = t; }
+      });
+      if (!list) return;
+      var gap = 10 * zoomOf(h), lb = textBox(list);
+      setTranslate(list, 0, hb.bottom + gap - lb.top);
+    });
+  }
+
   /* ---------- подвал на всё окно, призыв по ширине карточки ---------- */
   function footerFill() {
     var rec = $(FOOTER); if (!rec) return;
@@ -369,6 +394,7 @@
     try { footerFill(); } catch (e) { console.warn(e); }
     try { alignCaseTitles(); } catch (e) { console.warn(e); }
     try { alignStars(); } catch (e) { console.warn(e); }
+    try { alignStages(); } catch (e) { console.warn(e); }
     try { logoMeasure(); } catch (e) { console.warn(e); }
   }
   var timer;

@@ -122,6 +122,22 @@ html.vs-lb-lock, html.vs-lb-lock body { overflow: hidden !important; }
 
 /* рукописное «Семейный фотограф» остаётся поверх большого имени */
 #rec4193905301 .tn-elem[data-elem-id="1774443653075000001"] { z-index: 9999 !important; }
-html.vs-logo-center #rec4193905201 .tn-elem:has(.js-header-word) { visibility: hidden !important; }
+html.vs-logo-center .js-header-word, html.vs-logo-center .js-header-word-1 { visibility: hidden !important; }
 #vs-lb button:focus { outline: none; }
 #vs-lb button:focus-visible { outline: 1px solid #FF4D00; outline-offset: 4px; }
+
+/* второй закреплённый хедер (белая плашка) — без своей копии имени, появляется вместе с шапкой */
+#rec4193905601 .tn-elem[data-elem-id="1765960002219000001"] { visibility: hidden !important; }
+#rec4193905601 .t396__artboard { opacity: 0 !important; pointer-events: none !important; transition: opacity .35s ease !important; }
+html.vs-docked #rec4193905601 .t396__artboard { opacity: 1 !important; }
+
+/* пункты списков: оранжевая точка вместо наклонной черты */
+.vs-b {
+  display: inline-block; width: .42em; height: .42em; border-radius: 50%;
+  background: #FF4D00; margin-right: .6em; vertical-align: .12em;
+}
+.vs-li { display: block; position: relative; padding-left: 1.05em; }
+.vs-li::before {
+  content: ''; position: absolute; left: 0; top: calc(.5lh - .21em);
+  width: .42em; height: .42em; border-radius: 50%; background: #FF4D00;
+}
