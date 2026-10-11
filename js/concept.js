@@ -112,7 +112,7 @@
     L = {
       x0: x0, y0: y0, x1: hRect.x, y1: hRect.y - hdrStart.top + 0, k: hRect.w / w,
       end: Math.max(120, heroH - (hdrStart.height || 38) - 40),
-      c0: [255, 255, 255, .82], c1: [73, 64, 62, 1]
+      c0: window.VS_LOGO_FROM || [255, 255, 255, .82], c1: [73, 64, 62, 1]
     };
     logoUpdate();
     logo.classList.add('vs-ready');
