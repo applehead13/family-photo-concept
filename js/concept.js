@@ -761,7 +761,18 @@
     db.style.translate = dx + 'px ' + dy + 'px';
     db.style.rotate = '-78deg'; db.style.scale = k;
   }
+  /* ---------- закреплённое меню: номер раздела убран, «меню» занимает его место ---------- */
+  function headerMenu() {
+    var H = $(HEADER), H2 = $('#rec4193905601'); if (!H || !H2) return;
+    var num = $('.js-header-word-1', H2), menu = el('1770904252712000003', H);
+    if (!num || !menu) return;
+    menu.style.translate = '';
+    var nr = num.getBoundingClientRect(), mr = menu.getBoundingClientRect();
+    if (!nr.width || !mr.width) return;
+    setTranslate(menu, nr.right - mr.right, 0);
+  }
   function layout() {
+    try { headerMenu(); } catch (e) { console.warn(e); }
     try { heroFill(); } catch (e) { console.warn(e); }
     try { footerFill(); } catch (e) { console.warn(e); }
     try { alignCaseTitles(); } catch (e) { console.warn(e); }
