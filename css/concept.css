@@ -203,3 +203,4 @@ svg.vs-film-mark { overflow: visible; pointer-events: none; }
 .uc-flip-back .t396__group .t396__elem[data-elem-type="text"],
 .uc-flip-back .t396__group .t396__elem[data-elem-type="text"] .tn-atom { height: auto !important; }
 .uc-flip-back .t396__group .t396__group { height: auto !important; }
+.tn-atom { text-wrap: pretty; }
