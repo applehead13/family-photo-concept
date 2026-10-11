@@ -204,3 +204,15 @@ svg.vs-film-mark { overflow: visible; pointer-events: none; }
 .uc-flip-back .t396__group .t396__elem[data-elem-type="text"] .tn-atom { height: auto !important; }
 .uc-flip-back .t396__group .t396__group { height: auto !important; }
 .tn-atom { text-wrap: pretty; }
+
+/* --- процесс работы: без двигающихся квадратиков и рисунков «старт»/«финиш» */
+#rec4193906401 .tn-elem[data-elem-id="1770742156134000012"], #rec4193906401 .tn-elem[data-elem-id="1770742530341000009"],
+#rec4193906401 .tn-elem[data-elem-id="1770742529461000008"], #rec4193906401 .tn-elem[data-elem-id="1770801767015000001"],
+#rec4193906401 .tn-elem[data-elem-id="1770802308791000007"], #rec4193906401 .tn-elem[data-elem-id="1770802308791000008"],
+#rec4193906401 .tn-elem[data-elem-id="1770803173408000003"], #rec4193906401 .tn-elem[data-elem-id="1770803144785000001"],
+#rec4193906401 .tn-elem[data-elem-id="1770803173919000004"], #rec4193906401 .tn-elem[data-elem-id="1770803174344000005"],
+#rec4193906401 .tn-elem[data-elem-id="1770804933496000001"], #rec4193906401 .tn-elem[data-elem-id="1770804971991000003"],
+#rec4193906401 .tn-elem[data-elem-id="1770804972503000004"], #rec4193906401 .tn-elem[data-elem-id="1770804973039000005"],
+#rec4193906401 .tn-elem[data-elem-id="1770804973471000006"],
+#rec4193906401 .tn-elem[data-elem-id="1774433160583000001"], #rec4193906401 .tn-elem[data-elem-id="1774433339143000002"],
+#rec4193906401 .tn-elem[data-elem-id="1775406920234000001"], #rec4193906401 .tn-elem[data-elem-id="1775406348148"] { display: none !important; }
