@@ -580,13 +580,13 @@
     pick.innerHTML = '<svg viewBox="0 0 100 66" preserveAspectRatio="none"><path d="M3 5 C 30 2, 70 3, 97 4 C 98 22, 97 45, 96 62 C 70 64, 32 63, 4 61 C 2 44, 3 22, 4 3" fill="none" class="vs-mk"/></svg>';
     root.appendChild(pick);
     var capH = 0; root.querySelectorAll('.vs-film-cap').forEach(function (c) { capH = Math.max(capH, c.offsetHeight); });
-    rec.appendChild(root);
+    var board = rec.querySelector('.t396__artboard') || rec; board.appendChild(root); // артборд обрезает плёнку за пределами блока
     root.querySelectorAll('.vs-film-cap').forEach(function (c) { capH = Math.max(capH, c.offsetHeight); });
     root.querySelectorAll('.vs-film-text').forEach(function (tx) { (tx._marks || []).forEach(function (mk) { drawMark(tx, mk[0], mk[1]); }); });
     sheet.style.left = (x0 - 0.2 * P) + 'px'; sheet.style.width = (x1 - x0 + 0.35 * P) + 'px';
     sheet.style.top = sheetTop + 'px'; sheet.style.height = (stripTop - sheetTop + FH + 18 * u + capH + 34 * u) + 'px';
     if (getComputedStyle(rec).position === 'static') rec.style.position = 'relative';
-    film = { root: root, rec: rec, anchor: E[0].inner };
+    film = { root: root, rec: board, anchor: E[0].inner };
     filmTrack();
   }
   function filmTrack() {
@@ -740,7 +740,15 @@
   }
   var timer;
   function relayout() { clearTimeout(timer); timer = setTimeout(layout, 180); }
+  // ручные переносы в абзацах мешали типографике: строки переносит браузер, с неразрывными пробелами
+  function unbreak() {
+    $$('.tn-atom').forEach(function (a) {
+      if (!a.querySelector('br') || !/Source Code/.test(getComputedStyle(a).fontFamily)) return;
+      $$('br', a).forEach(function (br) { br.replaceWith(document.createTextNode(' ')); });
+    });
+  }
   function start() {
+    unbreak();
     cleanMenus();
     layout();
     collectPhotos();
