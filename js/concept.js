@@ -132,7 +132,7 @@
       c0: window.VS_LOGO_FROM || [73, 64, 62, 1], c1: [73, 64, 62, 1]
     };
     logoUpdate();
-    logo.classList.add('vs-ready');
+    if (window.__vsShown) logo.classList.add('vs-ready');
   }
   function logoUpdate() {
     if (!L || !logo) return;
@@ -793,9 +793,14 @@
     initGallery();
     window.addEventListener('scroll', logoUpdate, { passive: true });
     window.addEventListener('resize', relayout);
-    setTimeout(layout, 700);
     setTimeout(layout, 2000);
+    // двойной проход: когда всё встало на места, заставка может уходить
+    requestAnimationFrame(function () { requestAnimationFrame(function () {
+      layout(); window.__vsReady = true; window.dispatchEvent(new Event('vs-ready'));
+    }); });
   }
+  setTimeout(function () { document.documentElement.classList.add('vs-loaded'); }, 7000);
+  window.addEventListener('vs-shown', function () { document.documentElement.classList.add('vs-loaded'); if (logo) logo.classList.add('vs-ready'); });
   function ready() {
     var go = function () { (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(start); };
     if (document.readyState === 'complete') setTimeout(go, 300); else window.addEventListener('load', function () { setTimeout(go, 300); });

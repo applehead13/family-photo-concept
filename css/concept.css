@@ -220,5 +220,21 @@ svg.vs-film-mark { overflow: visible; pointer-events: none; }
 /* первый экран: белая бумага на всё окно вместо голубого фона */
 #rec4193905301 .tn-elem[data-elem-id="1790584134023"],
 #rec4193905301 .tn-elem[data-elem-id="1790865737965"] { opacity: 0 !important; }
-#rec4193905301, #rec4193905301 .t396__artboard { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .3 0 0 0 0 .25 0 0 0 0 .2 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"), linear-gradient(rgba(248,246,242,.35), rgba(248,246,242,.35)), url(../images/tild6130-6666-4662-b934-326366383038__noroot.png) center/cover no-repeat #F8F6F2 !important; }
-#rec4193905301 .t396__carrier, #rec4193905301 .t396__filter { background: none !important; }
+#rec4193905301 { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .3 0 0 0 0 .25 0 0 0 0 .2 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"), linear-gradient(rgba(248,246,242,.35), rgba(248,246,242,.35)), url(../images/paper-hero.jpg) center/cover no-repeat #F8F6F2 !important; }
+#rec4193905301 .t396__artboard, #rec4193905301 .t396__carrier, #rec4193905301 .t396__filter { background: none !important; }
+/* пока идёт заставка, содержимое первого экрана скрыто; потом всё появляется разом */
+#rec4193905301 .t396__artboard { transition: opacity .7s ease; }
+html:not(.vs-loaded) #rec4193905301 .t396__artboard { opacity: 0; }
+#vs-logo { transition: opacity .7s ease; }
+
+/* первый экран: оранжевый заголовок и кнопка, красный «REC», чистое фото со скрепкой */
+#rec4193905301 .tn-elem[data-elem-id="1765879234013"] .tn-atom,
+#rec4193905301 .tn-elem[data-elem-id="1765879234013"] .tn-atom * { color: #FF4D00 !important; }
+#rec4193905301 .tn-elem[data-elem-id="1765885621834000001"] .tn-atom { background-color: #FF4D00 !important; color: #fff !important; transition: background-color .3s ease, box-shadow .3s ease; }
+#rec4193905301 .tn-elem[data-elem-id="1765885621834000001"] .tn-atom * { color: #fff !important; }
+#rec4193905301 .tn-elem[data-elem-id="1765885621834000001"]:hover .tn-atom { background-color: #E04300 !important; }
+#rec4193905301 .tn-elem[data-elem-id="1770388091245"] .tn-atom { background: #E5232A !important; border-radius: 50% !important; animation: vs-rec 1.3s steps(1, end) infinite; }
+@keyframes vs-rec { 0%, 100% { opacity: 1; } 55% { opacity: .12; } }
+#rec4193905301 .tn-elem[data-elem-id="1774626918803000002"],
+#rec4193905301 .tn-elem[data-elem-id="1774626918803000003"],
+#rec4193905301 .tn-elem[data-elem-id="1774626918803000004"] { display: none !important; }
