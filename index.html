@@ -947,7 +947,7 @@ alt='' imgfield='tn_img_1775034432181000007'
 }
 </style> <!-- nominify end --> </div> </div> </div> </div> <div id="rec4193909601" class="r t-rec" style=" " data-animationappear="off" data-record-type="131"> <!-- T123 --> <div class="t123"> <div class="t-container_100 "> <div class="t-width t-width_100 "> <!-- nominify begin --> <div class="preloader" aria-hidden="true"><div class="vs-pre-frame"><i></i></div></div> <style>
 .scale-in { overflow: hidden !important; }
-.preloader { position: fixed; inset: 0; z-index: 2147483640; background: #E5E4E1; display: flex; align-items: center; justify-content: center; pointer-events: none; }
+.preloader { position: fixed; inset: 0; z-index: 2147483640; background: #E5E4E1; display: none; /* заставка выключена: вернуть — поставить flex */ align-items: center; justify-content: center; pointer-events: none; }
 .vs-pre-frame { position: relative; width: 66px; height: 46px; --c: #49403E;
   background:
     linear-gradient(var(--c),var(--c)) 0 0/10px 1.6px, linear-gradient(var(--c),var(--c)) 0 0/1.6px 10px,
@@ -976,14 +976,11 @@ if (w >= 480) {
 let preDone = false;
 function preEnd() {
   if (preDone) return; preDone = true;
-  gsap.timeline()
-    .to(".vs-pre-frame", { scale: 0.86, duration: 0.18, ease: "power2.in" })
-    .to(".vs-pre-frame", { scale: 1, duration: 0.22, ease: "power2.out" })
-    .to(preloader, { autoAlpha: 0, duration: 0.6, ease: "power1.out", onComplete: () => { preloader.remove(); window.__vsShown = true; window.dispatchEvent(new Event("vs-shown")); initScrollReveal(); } }, "-=0.05");
+  preloader.remove(); window.__vsShown = true; window.dispatchEvent(new Event("vs-shown")); initScrollReveal();
 }
 const preStart = Date.now();
 // заставка уходит только когда вёрстка первого экрана собрана и больше не двигается
-const preGo = () => setTimeout(preEnd, Math.max(150, 900 - (Date.now() - preStart)));
+const preGo = () => setTimeout(preEnd, 0);
 if (window.__vsReady) preGo(); else window.addEventListener("vs-ready", preGo);
 setTimeout(preEnd, 5000);
 

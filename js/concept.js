@@ -829,16 +829,26 @@
     window.addEventListener('scroll', logoUpdate, { passive: true });
     window.addEventListener('resize', relayout);
     setTimeout(layout, 2000);
-    // двойной проход: когда всё встало на места, заставка может уходить
-    requestAnimationFrame(function () { requestAnimationFrame(function () {
-      layout(); window.__vsReady = true; window.dispatchEvent(new Event('vs-ready'));
-    }); });
+    // имя показываем, только когда вёрстка перестала двигаться (Тильда достраивает артборд уже после загрузки шрифтов)
+    var sig = '', calm = 0, tries = 0;
+    (function settle() {
+      layout();
+      var art = $('.t396__artboard', $(HERO)), lg = $('#vs-logo'), r = art ? art.getBoundingClientRect() : {}, l = lg ? lg.getBoundingClientRect() : {};
+      var now = [r.height, r.width, l.top, l.left, l.width, window.innerHeight].map(function (v) { return Math.round(v || 0); }).join(',');
+      calm = now === sig ? calm + 1 : 0; sig = now; tries++;
+      if (calm >= 4 || tries > 40) { window.__vsReady = true; window.dispatchEvent(new Event('vs-ready')); return; }
+      setTimeout(settle, 100);
+    })();
   }
-  setTimeout(function () { document.documentElement.classList.add('vs-loaded'); }, 7000);
   window.addEventListener('vs-shown', function () { document.documentElement.classList.add('vs-loaded'); if (logo) logo.classList.add('vs-ready'); });
   function ready() {
-    var go = function () { (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(start); };
-    if (document.readyState === 'complete') setTimeout(go, 300); else window.addEventListener('load', function () { setTimeout(go, 300); });
+    // первый экран не ждёт полной загрузки страницы: хватает шрифтов и главного фото (но не дольше 3 секунд)
+    var cap = new Promise(function (r) { setTimeout(r, 3000); });
+    var fonts = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
+    var hero = new Promise(function (r) { var i = new Image(); i.onload = i.onerror = r; i.src = 'images/photo-hero.jpg'; });
+    var dom = document.readyState === 'loading' ? new Promise(function (r) { document.addEventListener('DOMContentLoaded', r); }) : Promise.resolve();
+    Promise.race([Promise.all([fonts, hero, dom]), cap]).then(function () { setTimeout(start, 50); });
+    window.addEventListener('load', function () { setTimeout(layout, 300); });
   }
   ready();
 })();
