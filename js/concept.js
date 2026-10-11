@@ -440,9 +440,9 @@
   var FILM_CARDS = [
     { g: '1771257201668000011', inner: '1771257201668000013', title: '1771257201668000012', text: '1771257201668000014' },
     { g: '1771267095633000005', inner: '1771267095633000007', title: '1771267095633000006', text: '1771267095634000008' },
-    { g: '1771266918902000001', inner: '1771266918903000003', title: '1771266918903000002', text: '1771266918904000004', vec: '1774468773213' },
+    { g: '1771266918902000001', inner: '1771266918903000003', title: '1771266918903000002', text: '1771266918904000004', marks: [['oval', 'официально'], ['line', 'остаюсь на связи']] },
     { g: '1771267294117000009', inner: '1771267294117000011', title: '1771267294117000010', text: '1771267294117000012' },
-    { g: '1771256860735000001', inner: '1771256943882000010', title: '1771256903533000009', text: '1771256860735000002', vec: '1774467911285' }
+    { g: '1771256860735000001', inner: '1771256943882000010', title: '1771256903533000009', text: '1771256860735000002', marks: [['oval', 'план съёмки'], ['line', 'весёлые моменты']] }
   ];
   var film = null;
   function filmEls(c, rec) {
@@ -466,6 +466,43 @@
     var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + tw.toFixed(2) + '" height="' + th.toFixed(2) + '"><mask id="m"><rect width="100%" height="100%" fill="white"/>' +
       hole(hy) + hole(th - hy - hh) + '</mask><rect width="100%" height="100%" fill="black" mask="url(#m)"/></svg>';
     return 'url("data:image/svg+xml,' + encodeURIComponent(svg) + '")';
+  }
+  // рукописная пометка вокруг или под фразой в тексте: овал по рамке слова, линия под каждой строкой
+  var markData = {};
+  function phraseRects(root, phrase) {
+    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT), nodes = [], text = '', n;
+    while ((n = walker.nextNode())) { nodes.push([n, text.length]); text += n.data; }
+    var re = new RegExp(phrase.split(' ').map(function (w) { return w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }).join('[\\s\\u00a0]*'));
+    var mt = re.exec(text); if (!mt) return [];
+    var i = mt.index, rg = document.createRange(), j = i + mt[0].length;
+    nodes.forEach(function (p) {
+      var s0 = p[1], s1 = p[1] + p[0].data.length;
+      if (i >= s0 && i <= s1) rg.setStart(p[0], i - s0);
+      if (j >= s0 && j <= s1) rg.setEnd(p[0], j - s0);
+    });
+    var lines = [];
+    Array.prototype.forEach.call(rg.getClientRects(), function (r) {
+      if (r.width < 2) return;
+      var l = lines.find(function (x) { return Math.abs(x.top - r.top) < r.height / 2; });
+      if (l) { l.left = Math.min(l.left, r.left); l.right = Math.max(l.right, r.right); l.bottom = Math.max(l.bottom, r.bottom); }
+      else lines.push({ left: r.left, right: r.right, top: r.top, bottom: r.bottom });
+    });
+    return lines;
+  }
+  function drawMark(tx, kind, phrase) {
+    var m = markData[kind === 'oval' ? 'images/hand-oval-1.svg' : 'images/hand-underline-1.svg']; if (!m) return;
+    var base = tx.getBoundingClientRect();
+    phraseRects(tx, phrase).forEach(function (r, k) {
+      var svg = document.createElementNS(SVGNS, 'svg'), x, y, w, h;
+      if (kind === 'oval') { x = r.left - 8; y = r.top - 7; w = r.right - r.left + 16; h = r.bottom - r.top + 12; }
+      else { x = r.left - 2; y = r.bottom - 3; w = r.right - r.left + 4; h = 7; }
+      svg.setAttribute('viewBox', m.vb.join(' ')); svg.setAttribute('preserveAspectRatio', 'none');
+      svg.setAttribute('class', 'vs-film-mark');
+      svg.style.left = (x - base.left) + 'px'; svg.style.top = (y - base.top) + 'px';
+      svg.style.width = w + 'px'; svg.style.height = h + 'px';
+      if (kind === 'line' && k % 2) svg.style.transform = 'scaleX(-1)';
+      markPaths(svg, m); tx.appendChild(svg);
+    });
   }
   function buildFilm() {
     var rec = $(FILM_REC); if (!rec) return;
@@ -525,7 +562,8 @@
       tx.innerHTML = xa.innerHTML; copyFont(xa, tx, zoomOf(e.text));
       var trc = e.text.getBoundingClientRect(); tx.style.width = trc.width + 'px';
       cap.appendChild(tx);
-      if (e.vec) {
+      tx._marks = FILM_CARDS[i].marks;
+      if (false) {
         var vr = e.vec.getBoundingClientRect(), vc = document.createElement('div'); vc.className = 'vs-film-mark';
         vc.innerHTML = (e.vec.querySelector('.tn-atom') || e.vec).innerHTML;
         vc.style.left = (vr.left - trc.left) + 'px'; vc.style.top = (vr.top - trc.top) + 'px';
@@ -539,11 +577,12 @@
     var pick = document.createElement('div'); pick.className = 'vs-film-pick';
     pick.style.left = (2 * P - 9 * u) + 'px'; pick.style.top = (stripTop + reb - 9 * u) + 'px';
     pick.style.width = (iw + 18 * u) + 'px'; pick.style.height = (ih + 18 * u) + 'px';
-    pick.innerHTML = '<svg viewBox="0 0 100 66" preserveAspectRatio="none"><path d="M3 5 C 30 2, 70 3, 97 4 C 98 22, 97 45, 96 62 C 70 64, 32 63, 4 61 C 2 44, 3 22, 4 3" fill="none" stroke="#FF4D00" stroke-width="1.6" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg>';
+    pick.innerHTML = '<svg viewBox="0 0 100 66" preserveAspectRatio="none"><path d="M3 5 C 30 2, 70 3, 97 4 C 98 22, 97 45, 96 62 C 70 64, 32 63, 4 61 C 2 44, 3 22, 4 3" fill="none" class="vs-mk"/></svg>';
     root.appendChild(pick);
     var capH = 0; root.querySelectorAll('.vs-film-cap').forEach(function (c) { capH = Math.max(capH, c.offsetHeight); });
     rec.appendChild(root);
     root.querySelectorAll('.vs-film-cap').forEach(function (c) { capH = Math.max(capH, c.offsetHeight); });
+    root.querySelectorAll('.vs-film-text').forEach(function (tx) { (tx._marks || []).forEach(function (mk) { drawMark(tx, mk[0], mk[1]); }); });
     sheet.style.left = (x0 - 0.2 * P) + 'px'; sheet.style.width = (x1 - x0 + 0.35 * P) + 'px';
     sheet.style.top = sheetTop + 'px'; sheet.style.height = (stripTop - sheetTop + FH + 18 * u + capH + 34 * u) + 'px';
     if (getComputedStyle(rec).position === 'static') rec.style.position = 'relative';
@@ -558,6 +597,62 @@
   function initFilm() {
     var loop = function () { filmTrack(); requestAnimationFrame(loop); };
     requestAnimationFrame(loop);
+  }
+
+  /* ---------- рукописные линии: все подчёркивания, овалы и стрелки одной толщины ----------
+     Файлы hand-*.svg вставлены Тильдой картинками разного размера, поэтому линия везде разная.
+     Встраиваем их векторами и задаём толщину в экранных пикселях. */
+  var MARK_W = 1.6;
+  var markSrc = {};
+  function loadMark(url) {
+    if (!markSrc[url]) markSrc[url] = fetch(url).then(function (r) { return r.text(); }).then(function (t) {
+      var d = new DOMParser().parseFromString(t, 'image/svg+xml').documentElement;
+      var vb = (d.getAttribute('viewBox') || '0 0 ' + d.getAttribute('width') + ' ' + d.getAttribute('height')).split(/[\s,]+/).map(Number);
+      return (markData[url] = { vb: vb, paths: Array.prototype.map.call(d.querySelectorAll('path'), function (p) { return p.getAttribute('d'); }) });
+    });
+    return markSrc[url];
+  }
+  var SVGNS = 'http://www.w3.org/2000/svg';
+  function markPaths(parent, m) {
+    m.paths.forEach(function (d) {
+      var p = document.createElementNS(SVGNS, 'path');
+      p.setAttribute('d', d); p.setAttribute('class', 'vs-mk');
+      parent.appendChild(p);
+    });
+  }
+  function initMarks() {
+    var jobs = [];
+    $$('svg image').forEach(function (img) {
+      var href = img.getAttribute('href') || img.getAttribute('xlink:href') || '';
+      if (!/hand-[a-z0-9-]+\.svg/.test(href)) return;
+      jobs.push(loadMark(href).then(function (m) {
+        var x = +img.getAttribute('x') || 0, y = +img.getAttribute('y') || 0, w = +img.getAttribute('width'), h = +img.getAttribute('height');
+        var vw = m.vb[2], vh = m.vb[3], k = Math.max(w / vw, h / vh);
+        var g = document.createElementNS(SVGNS, 'g');
+        g.setAttribute('transform', 'translate(' + (x + (w - vw * k) / 2 - m.vb[0] * k) + ' ' + (y + (h - vh * k) / 2 - m.vb[1] * k) + ') scale(' + k + ')');
+        markPaths(g, m);
+        img.parentNode.replaceChild(g, img);
+        var svg = g.ownerSVGElement; if (svg) svg.style.overflow = 'visible';
+      }));
+    });
+    $$('.tn-atom.t-bgimg').forEach(function (a) {
+      var u = (a.getAttribute('data-original') || '') + ' ' + a.style.backgroundImage;
+      var mm = u.match(/images\/hand-[a-z0-9-]+\.svg/); if (!mm) return;
+      jobs.push(loadMark(mm[0]).then(function (m) {
+        a.style.setProperty('background-image', 'none', 'important');
+        var svg = document.createElementNS(SVGNS, 'svg');
+        svg.setAttribute('viewBox', m.vb.join(' ')); svg.setAttribute('class', 'vs-mk-svg');
+        markPaths(svg, m); a.appendChild(svg);
+      }));
+    });
+    jobs.push(loadMark('images/hand-oval-1.svg'), loadMark('images/hand-underline-1.svg'));
+    return Promise.all(jobs).then(markWidths);
+  }
+  // толщина задаётся до зума Тильды: делим на зум, чтобы на экране было ровно MARK_W
+  function markWidths() {
+    $$('.t396__elem').forEach(function (e) {
+      if (e.querySelector('.vs-mk')) e.style.setProperty('--vs-mk-w', (MARK_W / zoomOf(e)).toFixed(3) + 'px');
+    });
   }
 
   /* ---------- галереи историй ---------- */
@@ -640,7 +735,7 @@
     try { alignCaseTitles(); } catch (e) { console.warn(e); }
     try { alignStars(); alignPrices(); } catch (e) { console.warn(e); }
     try { alignStages(); } catch (e) { console.warn(e); }
-    try { buildFilm(); } catch (e) { console.warn(e); }
+    try { markWidths(); buildFilm(); } catch (e) { console.warn(e); }
     try { logoMeasure(); } catch (e) { console.warn(e); }
   }
   var timer;
@@ -652,6 +747,7 @@
     initViewfinder();
     initServiceHover();
     initFilm();
+    initMarks().then(function () { try { buildFilm(); } catch (e) { console.warn(e); } });
     initGallery();
     window.addEventListener('scroll', logoUpdate, { passive: true });
     window.addEventListener('resize', relayout);
