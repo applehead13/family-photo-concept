@@ -159,3 +159,32 @@ html.vs-docked #rec4193905601 .t396__artboard { opacity: 1 !important; }
 .vs-price .tn-atom { font-family: 'Moniqa', Arial, sans-serif !important; font-weight: 400 !important; line-height: 1 !important; letter-spacing: 0 !important; }
 .vs-price .tn-atom .vs-unit { font-family: 'Source Code Pro', monospace; font-size: .45em; letter-spacing: 0; }
 .vs-price .tn-atom .vs-unit-b { display: block; font-size: .5em; margin-top: .25em; }
+
+/* --- принципы: контактный лист с плёнкой вместо карточек-полароидов */
+.vs-film-hide { visibility: hidden !important; }
+#vs-film { position: absolute; left: 0; top: 0; width: 0; height: 0; z-index: 40; pointer-events: none; will-change: transform; }
+#vs-film > * { position: absolute; }
+.vs-film-sheet {
+  background-color: #f3efe7;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .3 0 0 0 0 .25 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  border-radius: 3px; box-shadow: 0 1px 2px rgba(0,0,0,.18), 0 18px 40px rgba(20,12,8,.32);
+}
+.vs-film-strip {
+  background: linear-gradient(180deg, #1b1715 0%, #120f0e 50%, #1b1715 100%);
+  -webkit-mask-repeat: repeat-x; mask-repeat: repeat-x;
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,.35));
+}
+.vs-film-strip::after { /* лёгкий блик на глянцевой основе */
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(100deg, transparent 20%, rgba(255,255,255,.05) 35%, transparent 50%, transparent 70%, rgba(255,255,255,.035) 82%, transparent 92%);
+}
+.vs-film-edge { position: absolute; font: 600 9px/1 'Source Code Pro', monospace; color: #e0a84a; opacity: .78; letter-spacing: .08em; white-space: pre; }
+.vs-film-frame { position: absolute; background: #222 center/cover no-repeat; border-radius: 1.5px; box-shadow: inset 0 0 0 1px rgba(0,0,0,.35); }
+.vs-film-cap { color: #49403E; }
+.vs-film-title { display: flex; align-items: baseline; gap: .55em; margin-bottom: .55em; }
+.vs-film-title span:last-child { color: #49403E; }
+.vs-film-num { font: 600 11px/1 'Source Code Pro', monospace; color: #FF4D00; letter-spacing: .06em; }
+.vs-film-text { position: relative; color: #49403E; }
+.vs-film-mark { position: absolute; }
+.vs-film-mark svg { width: 100%; height: 100%; display: block; }
+.vs-film-pick svg { width: 100%; height: 100%; display: block; overflow: visible; }

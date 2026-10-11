@@ -433,6 +433,133 @@
     document.addEventListener('mouseleave', function () { mx = my = -1; queue(); });
   }
 
+  /* ---------- принципы: плёнка вместо карточек ----------
+     Тильда по-прежнему двигает свои карточки при скролле; мы их прячем и каждый кадр
+     ставим на их место плёнку с кадрами и подписи на листе бумаги. */
+  var FILM_REC = '#rec4193908101';
+  var FILM_CARDS = [
+    { g: '1771257201668000011', inner: '1771257201668000013', title: '1771257201668000012', text: '1771257201668000014' },
+    { g: '1771267095633000005', inner: '1771267095633000007', title: '1771267095633000006', text: '1771267095634000008' },
+    { g: '1771266918902000001', inner: '1771266918903000003', title: '1771266918903000002', text: '1771266918904000004', vec: '1774468773213' },
+    { g: '1771267294117000009', inner: '1771267294117000011', title: '1771267294117000010', text: '1771267294117000012' },
+    { g: '1771256860735000001', inner: '1771256943882000010', title: '1771256903533000009', text: '1771256860735000002', vec: '1774467911285' }
+  ];
+  var film = null;
+  function filmEls(c, rec) {
+    return {
+      g: rec.querySelector('[data-group-id="' + c.g + '"]'),
+      inner: rec.querySelector('[data-group-id="' + c.inner + '"]'),
+      title: el(c.title, rec), text: el(c.text, rec), vec: c.vec ? el(c.vec, rec) : null
+    };
+  }
+  function copyFont(from, to, z) {
+    var cs = getComputedStyle(from);
+    to.style.fontFamily = cs.fontFamily; to.style.fontWeight = cs.fontWeight;
+    to.style.fontSize = parseFloat(cs.fontSize) * z + 'px';
+    to.style.lineHeight = (parseFloat(cs.lineHeight) || parseFloat(cs.fontSize) * 1.2) * z + 'px';
+    var ls = parseFloat(cs.letterSpacing); to.style.letterSpacing = (isNaN(ls) ? 0 : ls * z) + 'px';
+  }
+  function holesMask(tw, th, reb, hw, hh, hy) {
+    // плитка шириной в шаг перфорации: всё непрозрачно, кроме двух отверстий
+    var x = (tw - hw) / 2, r = Math.min(hw, hh) * 0.18;
+    var hole = function (y) { return '<rect x="' + x.toFixed(2) + '" y="' + y.toFixed(2) + '" width="' + hw.toFixed(2) + '" height="' + hh.toFixed(2) + '" rx="' + r.toFixed(2) + '" fill="black"/>'; };
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + tw.toFixed(2) + '" height="' + th.toFixed(2) + '"><mask id="m"><rect width="100%" height="100%" fill="white"/>' +
+      hole(hy) + hole(th - hy - hh) + '</mask><rect width="100%" height="100%" fill="black" mask="url(#m)"/></svg>';
+    return 'url("data:image/svg+xml,' + encodeURIComponent(svg) + '")';
+  }
+  function buildFilm() {
+    var rec = $(FILM_REC); if (!rec) return;
+    var E = FILM_CARDS.map(function (c) { return filmEls(c, rec); });
+    if (E.some(function (e) { return !e.g || !e.inner || !e.text || !e.title; })) return;
+    var r0 = E[0].inner.getBoundingClientRect(), r1 = E[1].inner.getBoundingClientRect();
+    if (!r0.width) return;
+    var z = zoomOf(E[0].inner), P = r1.left - r0.left, u = r0.width / 302;
+    var N = E.length, gap = 17 * u, iw = P - gap, ih = iw * 2 / 3, reb = 44 * u, FH = ih + 2 * reb;
+    var lead = 0.35 * P, x0 = -gap / 2 - lead, x1 = (N - 1) * P + iw + gap / 2 + 0.25 * P;
+    var sheetTop = -150 * u, stripTop = sheetTop + 20 * u;
+
+    if (film) film.root.remove();
+    var root = document.createElement('div'); root.id = 'vs-film';
+    var sheet = document.createElement('div'); sheet.className = 'vs-film-sheet';
+    var strip = document.createElement('div'); strip.className = 'vs-film-strip';
+    root.appendChild(sheet); root.appendChild(strip);
+    strip.style.left = x0 + 'px'; strip.style.top = stripTop + 'px';
+    strip.style.width = (x1 - x0) + 'px'; strip.style.height = FH + 'px';
+    var pitch = P / 8, hw = 23 * u, hh = 16 * u, hy = 10 * u;
+    var m = holesMask(pitch, FH, reb, hw, hh, hy);
+    strip.style.webkitMaskImage = m; strip.style.maskImage = m;
+    strip.style.webkitMaskSize = pitch + 'px ' + FH + 'px'; strip.style.maskSize = pitch + 'px ' + FH + 'px';
+    strip.style.webkitMaskPosition = (((-x0 - gap / 2) % pitch) - pitch / 2) + 'px 0';
+    strip.style.maskPosition = strip.style.webkitMaskPosition;
+    var fs = Math.max(7, 8.5 * u);
+    // надписи по краю плёнки
+    for (var k = -1; k <= N; k++) {
+      var fx = k * P - gap / 2 - x0, n = 14 + k;
+      var a = document.createElement('span'); a.className = 'vs-film-edge';
+      a.textContent = '▸' + n; a.style.left = (fx + 6 * u) + 'px'; a.style.top = (FH - reb + 4 * u) + 'px'; a.style.fontSize = fs + 'px';
+      var b = document.createElement('span'); b.className = 'vs-film-edge';
+      b.textContent = n + 'A'; b.style.left = (fx + P / 2) + 'px'; b.style.top = (FH - reb + 4 * u) + 'px'; b.style.fontSize = fs + 'px';
+      strip.appendChild(a); strip.appendChild(b);
+      if (k % 2 === 0) {
+        var t = document.createElement('span'); t.className = 'vs-film-edge';
+        t.textContent = 'VS 400   ' + (5063 + k); t.style.left = (fx + P * 0.3) + 'px'; t.style.top = (reb - 4 * u - fs) + 'px'; t.style.fontSize = fs + 'px';
+        strip.appendChild(t);
+      }
+    }
+    E.forEach(function (e, i) {
+      var fr = document.createElement('div'); fr.className = 'vs-film-frame';
+      fr.style.left = (i * P - x0 - gap / 2 + gap / 2) + 'px'; fr.style.top = reb + 'px';
+      fr.style.width = iw + 'px'; fr.style.height = ih + 'px';
+      fr.style.backgroundImage = 'url(images/film/frame-' + (i + 1) + '.jpg)';
+      strip.appendChild(fr);
+
+      var cap = document.createElement('div'); cap.className = 'vs-film-cap';
+      cap.style.left = (i * P - gap / 2 + gap / 2) + 'px'; cap.style.top = (stripTop + FH + 18 * u) + 'px'; cap.style.width = iw + 'px';
+      var h = document.createElement('div'); h.className = 'vs-film-title';
+      var num = document.createElement('span'); num.className = 'vs-film-num'; num.textContent = String(14 + i);
+      num.style.fontSize = 11 * u + 'px';
+      var ta = e.title.querySelector('.tn-atom'), tt = document.createElement('span');
+      tt.textContent = ta.textContent.trim(); copyFont(ta, tt, zoomOf(e.title));
+      h.appendChild(num); h.appendChild(tt); cap.appendChild(h);
+      var xa = e.text.querySelector('.tn-atom'), tx = document.createElement('div'); tx.className = 'vs-film-text';
+      tx.innerHTML = xa.innerHTML; copyFont(xa, tx, zoomOf(e.text));
+      var trc = e.text.getBoundingClientRect(); tx.style.width = trc.width + 'px';
+      cap.appendChild(tx);
+      if (e.vec) {
+        var vr = e.vec.getBoundingClientRect(), vc = document.createElement('div'); vc.className = 'vs-film-mark';
+        vc.innerHTML = (e.vec.querySelector('.tn-atom') || e.vec).innerHTML;
+        vc.style.left = (vr.left - trc.left) + 'px'; vc.style.top = (vr.top - trc.top) + 'px';
+        vc.style.width = vr.width + 'px'; vc.style.height = vr.height + 'px';
+        tx.appendChild(vc);
+      }
+      root.appendChild(cap);
+      e.g.classList.add('vs-film-hide');
+    });
+    // отметка восковым карандашом, как на контактном листе
+    var pick = document.createElement('div'); pick.className = 'vs-film-pick';
+    pick.style.left = (2 * P - 9 * u) + 'px'; pick.style.top = (stripTop + reb - 9 * u) + 'px';
+    pick.style.width = (iw + 18 * u) + 'px'; pick.style.height = (ih + 18 * u) + 'px';
+    pick.innerHTML = '<svg viewBox="0 0 100 66" preserveAspectRatio="none"><path d="M3 5 C 30 2, 70 3, 97 4 C 98 22, 97 45, 96 62 C 70 64, 32 63, 4 61 C 2 44, 3 22, 4 3" fill="none" stroke="#FF4D00" stroke-width="1.6" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg>';
+    root.appendChild(pick);
+    var capH = 0; root.querySelectorAll('.vs-film-cap').forEach(function (c) { capH = Math.max(capH, c.offsetHeight); });
+    rec.appendChild(root);
+    root.querySelectorAll('.vs-film-cap').forEach(function (c) { capH = Math.max(capH, c.offsetHeight); });
+    sheet.style.left = (x0 - 0.2 * P) + 'px'; sheet.style.width = (x1 - x0 + 0.35 * P) + 'px';
+    sheet.style.top = sheetTop + 'px'; sheet.style.height = (stripTop - sheetTop + FH + 18 * u + capH + 34 * u) + 'px';
+    if (getComputedStyle(rec).position === 'static') rec.style.position = 'relative';
+    film = { root: root, rec: rec, anchor: E[0].inner };
+    filmTrack();
+  }
+  function filmTrack() {
+    if (!film) return;
+    var a = film.anchor.getBoundingClientRect(), r = film.rec.getBoundingClientRect();
+    film.root.style.transform = 'translate3d(' + (a.left - r.left) + 'px,' + (a.top - r.top) + 'px,0)';
+  }
+  function initFilm() {
+    var loop = function () { filmTrack(); requestAnimationFrame(loop); };
+    requestAnimationFrame(loop);
+  }
+
   /* ---------- галереи историй ---------- */
   var G = window.VS_GALLERIES || [];
   function galleryOf(e) {
@@ -513,6 +640,7 @@
     try { alignCaseTitles(); } catch (e) { console.warn(e); }
     try { alignStars(); alignPrices(); } catch (e) { console.warn(e); }
     try { alignStages(); } catch (e) { console.warn(e); }
+    try { buildFilm(); } catch (e) { console.warn(e); }
     try { logoMeasure(); } catch (e) { console.warn(e); }
   }
   var timer;
@@ -523,6 +651,7 @@
     collectPhotos();
     initViewfinder();
     initServiceHover();
+    initFilm();
     initGallery();
     window.addEventListener('scroll', logoUpdate, { passive: true });
     window.addEventListener('resize', relayout);
