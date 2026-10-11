@@ -643,7 +643,35 @@
   /* ---------- рукописные линии: все подчёркивания, овалы и стрелки одной толщины ----------
      Файлы hand-*.svg вставлены Тильдой картинками разного размера, поэтому линия везде разная.
      Встраиваем их векторами и задаём толщину в экранных пикселях. */
-  var MARK_W = 1.6;
+  /* ---------- мелок: рисованные элементы и крупные подписи Vasek выглядят нарисованными мелом ---------- */
+  function initChalk() {
+    if (!$('#vs-chalk-defs')) {
+      var d = document.createElement('div'); d.id = 'vs-chalk-defs'; d.setAttribute('aria-hidden', 'true');
+      d.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden;';
+      d.innerHTML = '<svg width="0" height="0"><defs><filter id="vs-chalk" x="-8%" y="-15%" width="116%" height="130%">' +
+        '<feTurbulence type="fractalNoise" baseFrequency=".05" numOctaves="2" seed="4" result="w"/>' +
+        '<feDisplacementMap in="SourceGraphic" in2="w" scale="3" result="d0"/>' +
+        '<feTurbulence type="fractalNoise" baseFrequency="1.1" numOctaves="2" seed="9" result="f"/>' +
+        '<feDisplacementMap in="d0" in2="f" scale="2" result="d"/>' +
+        '<feTurbulence type="fractalNoise" baseFrequency=".75 .9" numOctaves="3" seed="2" result="g"/>' +
+        '<feColorMatrix in="g" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 4.2 0 0 0 -1.25" result="m"/>' +
+        '<feComposite in="d" in2="m" operator="in" result="c"/><feGaussianBlur in="c" stdDeviation=".35"/></filter>' +
+        '<filter id="vs-chalk-t" x="-4%" y="-10%" width="108%" height="120%">' +
+        '<feTurbulence type="fractalNoise" baseFrequency=".04" numOctaves="2" seed="4" result="w"/><feDisplacementMap in="SourceGraphic" in2="w" scale="1.6" result="d"/>' +
+        '<feTurbulence type="fractalNoise" baseFrequency=".8 .95" numOctaves="3" seed="2" result="g"/>' +
+        '<feColorMatrix in="g" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 3.2 0 0 0 -.55" result="m"/>' +
+        '<feComposite in="d" in2="m" operator="in"/></filter></defs></svg>';
+      document.body.appendChild(d);
+    }
+    $$('.t396__elem[data-elem-type="text"] .tn-atom').forEach(function (a) {
+      if (a.classList.contains('vs-chalk-text')) return;
+      var cs = getComputedStyle(a);
+      if (!/Vasek/.test(cs.fontFamily)) return;
+      if (parseFloat(cs.fontSize) * zoomOf(a.closest('.t396__elem')) < 26) return;   // мелкий текст мелом не читается
+      a.classList.add('vs-chalk-text');
+    });
+  }
+  var MARK_W = 2.2;
   var markSrc = {};
   function loadMark(url) {
     if (!markSrc[url]) markSrc[url] = fetch(url).then(function (r) { return r.text(); }).then(function (t) {
@@ -818,6 +846,7 @@
   function start() {
     unbreak();
     cleanMenus();
+    try { initChalk(); } catch (e) { console.warn(e); }
     try { heroInk(); } catch (e) { console.warn(e); }
     layout();
     collectPhotos();

@@ -245,3 +245,26 @@ html:not(.vs-loaded) #rec4193905301 .t396__artboard { opacity: 0; }
 #rec4193908001 .vs-star-el { transition: opacity .2s ease; }
 #rec4193908001.vs-pop .vs-star-el { opacity: 0 !important; }
 #rec4193908601 .tn-elem[data-elem-id="1773759697555000002"] { display: none !important; }
+
+/* --- мелок --- */
+.vs-chalk-text { filter: url(#vs-chalk-t); -webkit-text-stroke: 1px currentColor; }
+.vs-mk-svg, svg.vs-film-mark, .vs-film-pick svg { filter: url(#vs-chalk); }
+#vs-film .vs-mk { --vs-mk-w: 2.2px; }
+/* пункты меню: вместо голубой плашки при наведении мелом рисуется волнистая линия */
+.t-popup .tn-elem[data-animate-sbs-event="hover"][data-elem-type="shape"] .tn-atom {
+  background-color: transparent !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 14' preserveAspectRatio='none'%3E%3Cpath d='M2 8 C14 3 24 12 40 7 S70 4 98 8' fill='none' stroke='%23E15F20' stroke-width='3.4' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E") !important;
+  background-size: 100% 100% !important; background-repeat: no-repeat !important;
+  filter: url(#vs-chalk);
+}
+
+/* --- настоящий полароид: плотная бумага, лёгкая текстура, мягкая тень, потёртые края --- */
+#rec4193905301 .tn-molecule:has([data-elem-id="1774443048931000006"]), #rec2340804781 .tn-molecule:has([data-elem-id="1783082958233000002"]), #rec2340804781 .tn-molecule:has([data-elem-id="1783082950946000001"]) {
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .38 0 0 0 0 .28 0 0 0 .11 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"), radial-gradient(120% 90% at 50% 40%, #FDFBF6 55%, #F1EADB 100%), #FBF8F1 !important;
+  border: 0 !important; border-radius: 3px !important;
+  box-shadow: 0 1px 1px rgba(40,28,16,.28), 0 6px 12px rgba(40,28,16,.16), 0 18px 30px rgba(30,20,10,.22), inset 0 0 0 1px rgba(150,125,85,.16), inset 0 -14px 22px -14px rgba(150,120,70,.28) !important;
+}
+#rec4193905301 [data-elem-id="1774443048931000006"] .tn-atom, #rec2340804781 [data-elem-id="1783082958233000002"] .tn-atom, #rec2340804781 [data-elem-id="1783082950946000001"] .tn-atom {
+  border-radius: 1px !important; box-shadow: inset 0 0 0 1px rgba(0,0,0,.18), inset 0 0 14px rgba(0,0,0,.22), 0 0 0 1px rgba(110,90,60,.16) !important;
+}
+.t-popup .tn-elem[data-animate-sbs-event="hover"][data-elem-type="shape"] .tn-atom { translate: 0 8px; }
