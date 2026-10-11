@@ -45,6 +45,16 @@
     return (metricsCache[key] = { base: asc / (asc + desc), cap: m.actualBoundingBoxAscent / (asc + desc) });
   }
   function baselineOf(lineRect, atom) { return lineRect.top + lineRect.height * fontMetrics(atom).base; }
+  // настоящая базовая линия последней строки: невидимый нулевой inline-block встаёт ровно на неё
+  function trueBaseline(atom) {
+    var pr = document.createElement('span');
+    pr.style.cssText = 'display:inline-block;width:0;height:0;vertical-align:baseline;';
+    var host = atom; while (host.lastElementChild && host.lastElementChild.tagName !== 'BR' && getComputedStyle(host.lastElementChild).display !== 'block') host = host.lastElementChild;
+    host.appendChild(pr);
+    var y = pr.getBoundingClientRect().bottom;
+    pr.remove();
+    return y;
+  }
   function setTranslate(e, dx, dy) {
     var z = zoomOf(e);
     e.style.translate = (dx / z) + 'px ' + (dy / z) + 'px';
@@ -207,6 +217,9 @@
       var a = e.querySelector('.tn-atom');
       return a && !e.classList.contains('vs-price') && /Moniqa/.test(getComputedStyle(a).fontFamily) && !/\?/.test(e.textContent) && visible(e) && !e.closest('[data-animate-sbs-event="hover"]');
     });
+    var deadlines = $$('.t396__elem[data-elem-type="text"]', rec).filter(function (e) {
+      return /^\s*[\d–-]+\s*дн/.test(e.textContent) && visible(e) && !e.closest('[data-animate-sbs-event="hover"]');
+    });
     var priced = [];
     $$('.t396__elem[data-elem-type="text"]', rec).forEach(function (e) {
       if (!/\d\s?\d{3}₽/.test(e.textContent) || e.closest('[data-animate-sbs-event="hover"]')) return;
@@ -235,9 +248,15 @@
     priced.forEach(function (p) { var b = textBox(p.e); if (b && p.room < 1e9) k = Math.min(k, p.room / (b.right - b.left)); });
     priced.forEach(function (p) {
       if (k < 1) p.atom.style.setProperty('font-size', (parseFloat(getComputedStyle(p.ta).fontSize) * 0.62 * k).toFixed(2) + 'px', 'important');
-      var tb = textBox(p.best), pb = textBox(p.e);
-      if (!tb || !pb) return;
-      setTranslate(p.e, 0, baselineOf(tb.first, p.ta) - baselineOf(pb.first, p.atom));
+      var pb = textBox(p.e); if (!pb) return;
+      // базовая линия — как у срока («10–14 дней») в той же строке; если срока нет — как у названия
+      var er = p.e.getBoundingClientRect(), cy = (er.top + er.bottom) / 2, dl = null, bd = 1e9;
+      deadlines.forEach(function (d) {
+        var r = d.getBoundingClientRect(), dd = Math.abs((r.top + r.bottom) / 2 - cy);
+        if (dd < bd && dd < 60 * zoomOf(d)) { bd = dd; dl = d; }
+      });
+      var ref = dl || p.best;
+      setTranslate(p.e, 0, trueBaseline(ref.querySelector('.tn-atom')) - trueBaseline(p.atom));
     });
   }
   function alignStars() {
@@ -254,6 +273,7 @@
       return /6134-6435-4665-a462-623832386266/.test(getComputedStyle(a).backgroundImage);
     });
     stars.forEach(function (s) {
+      s.classList.add('vs-star-el');
       var g = s.closest('.t396__group') || s;
       g.style.translate = '';
       if (!visible(s)) return;
@@ -443,6 +463,7 @@
         z.want = !starOn && mx >= a.l && mx <= a.r && my >= a.t && my <= a.b;
       });
       zones.forEach(function (z) { if (z.want !== z.on) { z.on = z.want; fire(z, z.on ? 'mouseenter' : 'mouseleave'); } });
+      R.classList.toggle('vs-pop', zones.some(function (z) { return z.on; }));
     }
     function queue(ev) { if (ev) { mx = ev.clientX; my = ev.clientY; } if (!raf) raf = requestAnimationFrame(check); }
     document.addEventListener('mousemove', queue, { passive: true });
