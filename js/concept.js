@@ -293,26 +293,42 @@
   }
   function initViewfinder() {
     if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
-    vf = document.createElement('div'); vf.id = 'vs-vf'; document.body.appendChild(vf);
-    var cur = null;
+    vf = document.createElement('div'); vf.id = 'vs-vf'; vf.appendChild(document.createElement('i'));
+    document.body.appendChild(vf);
+    var flash = document.createElement('div'); flash.id = 'vs-flash'; document.body.appendChild(flash);
+    document.documentElement.classList.add('vs-vf-active');
+    var cur = null, link = false;
     document.addEventListener('mousemove', function (ev) {
       vf.style.transform = 'translate(' + ev.clientX + 'px,' + ev.clientY + 'px)';
+      vf.classList.add('vs-ready');
       var hit = null, top = document.elementFromPoint(ev.clientX, ev.clientY);
-      if (top && !top.closest('a, button, #vs-lb')) {
-        for (var i = 0; i < photos.length; i++) {
-          var r = photos[i].getBoundingClientRect();
-          if (ev.clientX >= r.left && ev.clientX <= r.right && ev.clientY >= r.top && ev.clientY <= r.bottom && visible(photos[i])) { hit = photos[i]; break; }
+      var isLink = !!(top && top.closest('a, button, [role=button], .vs-nav, .tn-elem[data-elem-type="button"], .t396__elem a'));
+      if (top && !isLink && !top.closest('#vs-lb')) {
+        // только фото, которое сверху под курсором (или его рамка/подпись в той же группе)
+        var g = top.closest('.t396__group');
+        for (var j = 0; j < photos.length && !hit; j++) {
+          var ph = photos[j];
+          if ((ph === top || ph.contains(top) || (top.closest('.t396__elem') && top.contains(ph)) || (g && g.contains(ph))) && visible(ph)) {
+            var r = ph.getBoundingClientRect();
+            if (ev.clientX >= r.left && ev.clientX <= r.right && ev.clientY >= r.top && ev.clientY <= r.bottom) hit = ph;
+          }
         }
       }
+      if (isLink !== link) { link = isLink; vf.classList.toggle('vs-link', link); }
       if (hit !== cur) {
         cur = hit;
         vf.classList.remove('vs-on'); void vf.offsetWidth;
         if (hit) { vf.dataset.label = hit._vsLabel; vf.classList.add('vs-on'); }
-        document.documentElement.classList.toggle('vs-vf-active', !!hit);
       }
     }, { passive: true });
-    document.addEventListener('mousedown', function () { if (cur) vf.classList.add('vs-press'); });
-    document.addEventListener('mouseup', function () { vf.classList.remove('vs-press'); });
+    document.addEventListener('mouseleave', function () { vf.classList.remove('vs-ready'); });
+    document.addEventListener('mousedown', function () { vf.classList.add('vs-press'); });
+    document.addEventListener('mouseup', function () {
+      vf.classList.remove('vs-press');
+      // щелчок затвора: вспышка в рамке, над фото — ещё и лёгкая вспышка на весь экран
+      vf.classList.remove('vs-shot'); void vf.offsetWidth; vf.classList.add('vs-shot');
+      if (cur) { flash.classList.remove('vs-go'); void flash.offsetWidth; flash.classList.add('vs-go'); }
+    });
   }
 
   /* ---------- галереи историй ---------- */

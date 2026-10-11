@@ -56,36 +56,49 @@ html.vs-docked #rec4193905201 .t396__artboard { opacity: 1 !important; pointer-e
 /* --- вопросы: текст карточек от верхнего края */
 #rec4193908301 .tn-elem[data-elem-type="text"] .tn-atom { vertical-align: top !important; }
 
-/* --- курсор-видоискатель над фотографиями */
+/* --- курсор-видоискатель: основной курсор на всём сайте */
 #vs-vf {
-  position: fixed; left: 0; top: 0; width: 84px; height: 60px; margin: -30px 0 0 -42px;
-  z-index: 10001; pointer-events: none; opacity: 0;
+  position: fixed; left: 0; top: 0; width: 40px; height: 30px; margin: -15px 0 0 -20px;
+  z-index: 2147483646; pointer-events: none; opacity: 0;
   transition: opacity .2s ease, width .25s ease, height .25s ease, margin .25s ease;
-  --c: #fff;
+  --c: #49403E; --l: 9px; --w: 2px;
   background:
-    linear-gradient(var(--c),var(--c)) 0 0/12px 1.5px, linear-gradient(var(--c),var(--c)) 0 0/1.5px 12px,
-    linear-gradient(var(--c),var(--c)) 100% 0/12px 1.5px, linear-gradient(var(--c),var(--c)) 100% 0/1.5px 12px,
-    linear-gradient(var(--c),var(--c)) 0 100%/12px 1.5px, linear-gradient(var(--c),var(--c)) 0 100%/1.5px 12px,
-    linear-gradient(var(--c),var(--c)) 100% 100%/12px 1.5px, linear-gradient(var(--c),var(--c)) 100% 100%/1.5px 12px;
+    linear-gradient(var(--c),var(--c)) 0 0/var(--l) var(--w), linear-gradient(var(--c),var(--c)) 0 0/var(--w) var(--l),
+    linear-gradient(var(--c),var(--c)) 100% 0/var(--l) var(--w), linear-gradient(var(--c),var(--c)) 100% 0/var(--w) var(--l),
+    linear-gradient(var(--c),var(--c)) 0 100%/var(--l) var(--w), linear-gradient(var(--c),var(--c)) 0 100%/var(--w) var(--l),
+    linear-gradient(var(--c),var(--c)) 100% 100%/var(--l) var(--w), linear-gradient(var(--c),var(--c)) 100% 100%/var(--w) var(--l);
   background-repeat: no-repeat;
-  filter: drop-shadow(0 0 2px rgba(0,0,0,.35));
+  filter: drop-shadow(0 0 1px #fff) drop-shadow(0 0 1px #fff);
 }
+#vs-vf.vs-ready { opacity: 1; }
 #vs-vf::before { /* точка фокуса */
-  content: ''; position: absolute; left: 50%; top: 50%; width: 14px; height: 14px; margin: -7px 0 0 -7px;
-  border: 1.5px solid #FF4D00; border-radius: 1px; box-sizing: border-box;
-  transition: transform .3s ease;
+  content: ''; position: absolute; left: 50%; top: 50%; width: 5px; height: 5px; margin: -2.5px 0 0 -2.5px;
+  background: #FF4D00; border-radius: 50%; box-sizing: border-box;
+  transition: all .25s ease;
 }
 #vs-vf::after { /* подпись как на экране камеры */
   content: attr(data-label); position: absolute; left: 0; top: calc(100% + 6px); white-space: nowrap;
-  font: 500 10px/1 'Source Code Pro', monospace; color: #fff; letter-spacing: .04em;
+  font: 500 10px/1 'Source Code Pro', monospace; color: #fff; letter-spacing: .04em; opacity: 0; transition: opacity .2s;
 }
-#vs-vf.vs-on { opacity: 1; }
-#vs-vf.vs-on::before { animation: vs-af .5s ease-out; }
-#vs-vf.vs-press { width: 72px; height: 50px; margin: -25px 0 0 -36px; }
+#vs-vf i { /* вспышка при щелчке */
+  position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none;
+}
+/* над ссылкой и кнопкой: рамка сжимается и краснеет, как точка автофокуса */
+#vs-vf.vs-link { --c: #FF4D00; width: 28px; height: 22px; margin: -11px 0 0 -14px; }
+/* над фотографией: большая рамка, квадрат фокуса и параметры съёмки */
+#vs-vf.vs-on { --c: #fff; --l: 12px; --w: 1.5px; width: 84px; height: 60px; margin: -30px 0 0 -42px; filter: drop-shadow(0 0 2px rgba(0,0,0,.35)); }
+#vs-vf.vs-on::before { width: 14px; height: 14px; margin: -7px 0 0 -7px; background: none; border: 1.5px solid #FF4D00; border-radius: 1px; animation: vs-af .5s ease-out; }
+#vs-vf.vs-on::after { opacity: 1; }
+#vs-vf.vs-press { width: 32px; height: 24px; margin: -12px 0 0 -16px; }
+#vs-vf.vs-on.vs-press { width: 72px; height: 50px; margin: -25px 0 0 -36px; }
+#vs-vf.vs-shot i { animation: vs-flash .35s ease-out; }
 @keyframes vs-af { 0% { transform: scale(1.8); border-color: #fff; } 60% { transform: scale(.9); } 100% { transform: scale(1); } }
-html.vs-vf-active #trail-canvas { opacity: 0; }
+@keyframes vs-flash { 0% { opacity: .95; } 100% { opacity: 0; } }
+#vs-flash { position: fixed; inset: 0; background: #fff; pointer-events: none; z-index: 2147483645; opacity: 0; }
+#vs-flash.vs-go { animation: vs-flash-page .45s ease-out; }
+@keyframes vs-flash-page { 0% { opacity: .35; } 100% { opacity: 0; } }
+#trail-canvas { display: none !important; }
 html.vs-vf-active, html.vs-vf-active * { cursor: none !important; }
-.vs-photo { cursor: none; }
 
 /* --- галерея истории */
 #vs-lb {
