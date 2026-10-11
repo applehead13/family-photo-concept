@@ -729,12 +729,28 @@
   }
 
   /* ---------- запуск ---------- */
+  // коллаж «вне съёмок»: без кассеты плёнки, на её место встают гантели, повёрнутые вертикально.
+  // Позиции берём из вёрстки (offset*), а не из экрана: у элементов коллажа идут анимации появления.
+  function collageFix() {
+    var R = $('#rec4193908901'); if (!R) return;
+    var can = el('1774965548948000002', R), db = el('1774888240139000001', R);
+    if (!can || !db) return;
+    can.classList.remove('vs-hide');
+    var cl = can.offsetLeft, ct = can.offsetTop, cw = can.offsetWidth, ch = can.offsetHeight;
+    can.classList.add('vs-hide');
+    var cx = cl + cw / 2, cy = ct + ch * (window.innerWidth < 640 ? 0.8 : 0.5);
+    var dx = cx - (db.offsetLeft + db.offsetWidth / 2), dy = cy - (db.offsetTop + db.offsetHeight / 2);
+    var k = Math.min(0.95, (ch * 0.62) / db.offsetWidth);
+    db.style.translate = dx + 'px ' + dy + 'px';
+    db.style.rotate = '-78deg'; db.style.scale = k;
+  }
   function layout() {
     try { heroFill(); } catch (e) { console.warn(e); }
     try { footerFill(); } catch (e) { console.warn(e); }
     try { alignCaseTitles(); } catch (e) { console.warn(e); }
     try { alignStars(); alignPrices(); } catch (e) { console.warn(e); }
     try { alignStages(); } catch (e) { console.warn(e); }
+    try { collageFix(); } catch (e) { console.warn(e); }
     try { markWidths(); buildFilm(); } catch (e) { console.warn(e); }
     try { logoMeasure(); } catch (e) { console.warn(e); }
   }
