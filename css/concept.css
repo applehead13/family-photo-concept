@@ -244,3 +244,4 @@ html:not(.vs-loaded) #rec4193905301 .t396__artboard { opacity: 0; }
 /* пока открыто описание, чужие звёздочки не просвечивают сквозь него */
 #rec4193908001 .vs-star-el { transition: opacity .2s ease; }
 #rec4193908001.vs-pop .vs-star-el { opacity: 0 !important; }
+#rec4193908601 .tn-elem[data-elem-id="1773759697555000002"] { display: none !important; }
